@@ -1,16 +1,18 @@
 import datetime
 
-name = raw_input("What is your name ")
+name = str(raw_input("What is your name "))
 
-age = raw_input("What is your age ")
+age = int(raw_input("What is your age "))
 
-age = int(age)
+
+repetition = int(raw_input("Enter the number of time to  print the messages: "))
 
 noOfYears = 100 - age
 
 today = datetime.date.today()
+
 currentYear =  today.year
 
 futureYear = currentYear + noOfYears
  
-print name, "will be 100 years in", futureYear
+print repetition * (name + " will be 100 years in " + str(futureYear) + "\n")
