@@ -1,11 +1,17 @@
-a = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
-b = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
-
+import random
+a = []
+b = []
+counter = 0
+while counter <= 13:
+ a.append(random.randrange(100))
+ b.append(random.randrange(100))
+ counter += 1
 c = []
+print "list a: ", a
+print "list b: ", b
 
 for item in a:
- for item2 in b:
-    if item == item2:
+ if item in b and item not in c:
      c.append(item)
 
 
