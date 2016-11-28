@@ -1,58 +1,79 @@
+#coding=utf-8
+
 import re
 from bs4 import BeautifulSoup
 import urllib,urllib2,os,sys
 
-url = "http://xemphimso.com/xem-phim-chieu-rap.html"
-req = urllib2.Request(url)
-req.add_unredirected_header('User-agent','Mozilla/5.0')
-response = urllib2.urlopen(req)
-html = response.read()
-subvlinks = []
-soup = BeautifulSoup(html,"html.parser")
+def getHTML(url):
+  req = urllib2.Request(url)
+  req.add_unredirected_header('User-agent','Mozilla/5.0')
+  try:
+     response = urllib2.urlopen(req).read()
+  except urllib2.HTTPError, e:
+     response = e.getcode()
+  return response
 
-list = soup.find('ul',class_='cfv')
-mlist = []
+  
+
+url = "http://xemphimso.com/xem-phim-chieu-rap.html"
+subvlinks = []
+mList = []
 titleList = []
 linkList = []
 
+soup = BeautifulSoup(getHTML(url),"html.parser")
+list = soup.find('ul',class_='cfv')
+
+
 for item in list.select('li'):
- mlist.append(item.a.get('href'))
+ mList.append(item.a.get('href'))
  #print (item.a.get('href'))
  #print item.read.strip().encode('utf-8')
  titleList.append(item.a.get('title'))
-for each in mlist:
- each = str(each).strip('\'"')
- req1 = urllib2.Request(each)
- req1.add_unredirected_header('User-agent','Mozilla/5.0')
- getLink = urllib2.urlopen(req1)
- html = getLink.read()
+# img.append(item.a.get('src'))
+
+for mLink in mList:
+ 
+ html = getHTML(mLink) 
  tempLink = re.compile('<a class="btn-watch" href="(.+?)"').findall(html)
  verify = "javascript"
- confirm = [link for link in tempLink if verify in link]
- if len(confirm) > 0:
+ confirm = str(tempLink).find(verify) 
+ if confirm != -1:
+   mList.remove(mLink)
    continue
  else:
-   print str(tempLink).strip('\'"')
- #tempLink = str(tempLink).strip('\'"')
-  #req2 = urllib2.Request(tempLink[0])
- #req2.add_unredirected_header('User-agent','Mozilla/5.0')
- #getTempLink = urllib2.urlopen(req2)
- #html2 = getTempLink.read()
- #vlinks = re.compile('<script type="text/javascript" src="(.+?)"></script>').findall(html2)
- #subvlinks.append(vlinks[len(vlinks)-1])
- #print len(vlinks)
- #print tempLink
- #print subvlinks 
-for item in subvlinks:
- item = str(item).strip('\'"')
- print item
-  #req3 = urllib2.Request(item)
- #req3.add_unredirected_header('User-agent','Mozilla/5.0')
- #getFile = urllib2.urlopen(req3)
- #html3 = getFile.read()
+   html2 = getHTML(tempLink[0])
+   
+   vlinks = re.compile('<script type="text/javascript" src="(.+?)"></script>').findall(html2)
+   #vlinks = re.compile('a onclick="(.+?)" href="(.+?)"').findall(html2)
+   #print vlinks[0] 
+   search = "grab."
+   result = [s for s in vlinks if search in s]
+   if len(result) > 0:
+   #   #subvlinks.append(result)
+   #   print "get the file for ", result
+      html3 = getHTML(result[0])
+      if html3 == 404:
+   #     print "link broken"
+         mList.remove(mLink)
+         continue
+      else:
+        filelink = re.compile('"file":"(.+?)","label"').findall(html3)
+        #if len(filelink)==0:
+        #  link = item
+        if len(filelink)>=1:
+          link  = filelink[len(filelink)-1].replace('\\','').strip('"')
+          #print link
+          linkList.append(link)
+   else:
+     mList.remove(mLink)
+     continue     
+print len(mList), len(linkList)
+#for item in subvlinks:
+ #html3 = getHTML(item)
  #filelink = re.compile('"file":"(.+?)","label"').findall(html3)
  #if len(filelink)==0:
- #  link = item 
+  # link = item 
 
  #if len(filelink)>=1:
  #  link  = filelink[len(filelink)-1].replace('\\','').strip('"')
