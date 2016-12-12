@@ -82,3 +82,6 @@ elif mode[0] == 'folder':
    
 
 xbmcplugin.endOfDirectory(addon_handle)
+n
+
+# need to make functio
